@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIFFY | Entraide Citoyenne 24/7</title>
+    <style>
+        :root {
+            --bg-dark: #0b0d14;
+            --card-bg: #161b22;
+            --accent-red: #ff4d4d;
+            --accent-blue: #3498db;
+            --accent-green: #2ecc71;
+            --accent-yellow: #f1c40f;
+            --accent-purple: #9b59b6;
+            --text-light: #f0f6fc;
+            --text-dim: #8b949e;
+            --border-color: #30363d;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            margin: 0;
+            scroll-behavior: smooth;
+        }
+
+        .container { width: 90%; max-width: 1100px; margin: auto; padding: 40px 0; }
+        
+        /* --- HEADER --- */
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
+        .logo { font-size: 1.8rem; font-weight: 900; color: var(--accent-red); }
+        .tagline { font-size: 0.9rem; color: var(--text-dim); }
+
+        /* --- HERO --- */
+        .hero { text-align: center; padding: 80px 0; }
+        .hero h1 { font-size: 3rem; margin: 0; background: linear-gradient(to right, #fff, var(--text-dim)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero p { font-size: 1.2rem; color: var(--accent-red); font-weight: bold; margin-top: 10px; }
+
+        /* --- STATS GRID --- */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 40px 0; }
+        .stat-box { background: var(--card-bg); padding: 20px; border-radius: 12px; text-align: center; border: 1px solid var(--border-color); }
+        .stat-number { font-size: 2rem; font-weight: bold; color: var(--accent-red); display: block; }
+
+        /* --- SECTIONS --- */
+        section { padding: 60px 0; }
+        h2 { font-size: 2rem; text-align: center; margin-bottom: 40px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
+
+        /* --- CARDS --- */
+        .card { background: var(--card-bg); padding: 25px; border-radius: 15px; border: 1px solid var(--border-color); position: relative; }
+        .step-num { position: absolute; top: 15px; right: 20px; font-size: 2rem; font-weight: 900; opacity: 0.2; }
+        
+        /* --- MAP VISUAL --- */
+        .map-preview { height: 400px; background: #0d1117 url('https://i.imgur.com/your-map-placeholder.png') center/cover; border-radius: 20px; border: 2px solid var(--accent-blue); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+        .map-overlay { background: rgba(0,0,0,0.6); padding: 20px; border-radius: 10px; text-align: center; }
+
+        /* --- TABLE --- */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: var(--card-bg); border-radius: 10px; overflow: hidden; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        th { background: #1f242c; color: var(--accent-red); }
+        .check { color: var(--accent-green); font-weight: bold; }
+
+        /* --- BADGES --- */
+        .badge-list { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+        .badge { width: 120px; text-align: center; font-size: 0.8rem; }
+        .badge-icon { width: 60px; height: 60px; background: var(--border-color); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; border: 2px solid var(--accent-yellow); }
+
+        .btn { background: var(--accent-red); color: white; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 10px; transition: 0.3s; }
+        .btn:hover { opacity: 0.8; transform: scale(1.05); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="logo">MIIFFY</div>
+        <div class="tagline">ENTRAIDE CITOYENNE 24/7 [cite: 2]</div>
+    </header>
+
+    <section class="hero">
+        <h1>Parce que la solidarité ne dort jamais [cite: 3]</h1>
+        <p>L'entraide sans limite [cite: 41]</p>
+        <div class="stats-grid">
+            <div class="stat-box"><span class="stat-number">47</span>Bénévoles Actifs [cite: 12]</div>
+            <div class="stat-box"><span class="stat-number">12</span>Demandes [cite: 15]</div>
+            <div class="stat-box"><span class="stat-number">3</span>Urgences 24h [cite: 18]</div>
+            <div class="stat-box"><span class="stat-number">8min</span>Délai Moyen [cite: 20]</div>
+        </div>
+    </section>
+
+    <section id="mission">
+        <h2>Notre Mission [cite: 39]</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Disponible 24/24 [cite: 46]</h3>
+                <p>Les besoins surgissent à toute heure. MIFFY ne ferme jamais. [cite: 47]</p>
+            </div>
+            <div class="card">
+                <h3>Connexion instantanée [cite: 48]</h3>
+                <p>Notre algorithme relie la demande au bénévole le plus proche. [cite: 49]</p>
+            </div>
+            <div class="card">
+                <h3>Sécurisé & fiable [cite: 50]</h3>
+                <p>Vérification d'identité, assurance RC incluse pour chaque mission. [cite: 51]</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="services">
+        <h2>Une palette complète d'entraide [cite: 53]</h2>
+        <div class="grid">
+            <div class="card" style="border-left: 4px solid var(--accent-green);">
+                <h3>Assistance mobilité [cite: 54]</h3>
+                <p>Accompagnement pour déplacements, courses, démarches admin. [cite: 55]</p>
+            </div>
+            <div class="card" style="border-left: 4px solid var(--accent-yellow);">
+                <h3>Aide aux seniors [cite: 56]</h3>
+                <p>Visites régulières, soutien moral, petits travaux domestiques. [cite: 57]</p>
+            </div>
+            <div class="card" style="border-left: 4px solid var(--accent-blue);">
+                <h3>Bricolage solidaire [cite: 58]</h3>
+                <p>Réparations, montage meubles, jardinage, dépannages. [cite: 59]</p>
+            </div>
+            <div class="card" style="border-left: 4px solid var(--accent-red);">
+                <h3>Urgences citoyennes [cite: 60]</h3>
+                <p>Alerte immédiate et intervention rapide via notre réseau actif. [cite: 61]</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="how-it-works">
+        <h2>Simple, rapide, efficace [cite: 63]</h2>
+        <div class="grid">
+            <div class="card"><span class="step-num">01</span><h3>Inscription gratuite [cite: 64]</h3><p>Créez votre profil en quelques minutes (aidant ou bénéficiaire). [cite: 68]</p></div>
+            <div class="card"><span class="step-num">02</span><h3>Demande géolocalisée [cite: 66]</h3><p>Utilisez la Spidey-map pour visualiser les bénévoles en temps réel. [cite: 69]</p></div>
+            <div class="card"><span class="step-num">03</span><h3>Mise en relation [cite: 70]</h3><p>Notre algorithme connecte votre demande aux volontaires proches. [cite: 74]</p></div>
+            <div class="card"><span class="step-num">04</span><h3>Évaluation [cite: 72]</h3><p>Bénéficiaires et aidants s'évaluent mutuellement après intervention. [cite: 75]</p></div>
+        </div>
+    </section>
+
+    <section id="map">
+        <h2>La carte interactive MIFFY [cite: 77]</h2>
+        <div class="map-preview">
+            <div class="map-overlay">
+                <h3>Votre Spidey-sense de la solidarité [cite: 78]</h3>
+                <p>Interface intuitive, navigation fluide et temps réel. [cite: 79, 81]</p>
+                <a href="#" class="btn">Lancer la Spidey-Map</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="rewards">
+        <h2>Chaque geste mérite d'être célébré [cite: 106]</h2>
+        <div class="badge-list">
+            <div class="badge"><div class="badge-icon">🏆</div>Points de contribution [cite: 109]</div>
+            <div class="badge"><div class="badge-icon">🏅</div>Super Bricoleur [cite: 115]</div>
+            <div class="badge"><div class="badge-icon">🎁</div>Bons d'achat [cite: 120]</div>
+        </div>
+        <p style="text-align:center; color:var(--text-dim); margin-top:20px;">15+ badges à collectionner pour vos compétences reconnues[cite: 116, 118].</p>
+    </section>
+
+    <section id="analyse">
+        <h2>Pourquoi MIFFY se démarque [cite: 142]</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Caractéristique </th>
+                    <th>MIFFY </th>
+                    <th>Plateformes A/B </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Disponibilité</td><td><span class="check">24/7 ✓</span></td><td>Heures ouvrées</td></tr>
+                <tr><td>Vérification</td><td><span class="check">Approfondie ✓</span></td><td>Standard</td></tr>
+                <tr><td>Assurance RC</td><td><span class="check">Incluse ✓</span></td><td>Optionnelle</td></tr>
+                <tr><td>Rapidité</td><td><span class="check">Très rapide ✓</span></td><td>Variable</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section id="securite">
+        <h2>Sécurité & Légalité [cite: 90]</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Protection RGPD [cite: 92]</h3>
+                <p>Données chiffrées de bout en bout. Jamais partagées. [cite: 93]</p>
+            </div>
+            <div class="card">
+                <h3>Assurance RC [cite: 98]</h3>
+                <p>Couverture responsabilité civile incluse pour toutes les interventions. [cite: 99]</p>
+            </div>
+            <div class="card">
+                <h3>Loi 1901 [cite: 97]</h3>
+                <p>Association sans but lucratif avec gouvernance transparente. [cite: 102]</p>
+            </div>
+        </div>
+    </section>
+
+    <footer style="text-align: center; border-top: 1px solid var(--border-color); padding-top: 40px;">
+        <div class="logo">MIIFFY</div>
+        <p>Ensemble, réinventons la solidarité de proximité [cite: 147]</p>
+    </footer>
+</div>
+
+</body>
+</html>
