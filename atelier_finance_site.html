@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Finance en pratique — Atelier Interactif</title>
+<style>
+  :root {
+    --bg: #05081A;
+    --panel: #0D1535;
+    --card: #111C42;
+    --cyan: #00D4FF;
+    --purple: #6C3CE1;
+    --gold: #FFD700;
+    --green: #00E5A0;
+    --red: #FF4D6D;
+    --white: #FFFFFF;
+    --gray: #8899CC;
+    --border: #1E2A5A;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    height: 4px;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  }
+
+  /* ── PROGRESS ── */
+  .progress-wrap {
+    position: fixed; top: 4px; left: 0; right: 0; z-index: 99;
+    background: var(--panel);
+    padding: 10px 20px;
+    display: flex; align-items: center; gap: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .progress-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+    color: var(--gray); white-space: nowrap;
+    text-transform: uppercase;
+  }
+  .progress-bar-bg {
+    flex: 1; height: 6px; background: var(--border);
+    border-radius: 3px; overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+  .progress-pct {
+    font-size: 12px; font-weight: 700; color: var(--cyan);
+    min-width: 36px; text-align: right;
+  }
+
+  /* ── MAIN CONTAINER ── */
+  .main {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 90px 20px 40px;
+  }
+
+  /* ── SECTION ── */
+  .section { display: none; animation: fadeIn 0.35s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── SECTION HEADER ── */
+  .section-badge {
+    display: inline-block;
+    background: var(--purple);
+    color: var(--white);
+    font-size: 10px; font-weight: 800;
+    letter-spacing: 2px; text-transform: uppercase;
+    padding: 4px 12px; border-radius: 4px;
+    margin-bottom: 14px;
+  }
+  .section-title {
+    font-size: 26px; font-weight: 800;
+    line-height: 1.2; margin-bottom: 6px;
+  }
+  .section-title span { color: var(--cyan); }
+  .section-sub {
+    font-size: 13px; color: var(--gray);
+    margin-bottom: 28px; line-height: 1.6;
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: ''; position: absolute;
+    left: 0; top: 0; bottom: 0; width: 4px;
+    background: var(--cyan);
+    border-radius: 0;
+  }
+  .card.purple::before { background: var(--purple); }
+  .card.gold::before   { background: var(--gold); }
+  .card.green::before  { background: var(--green); }
+  .card.red::before    { background: var(--red); }
+
+  .card-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--cyan);
+    margin-bottom: 8px;
+  }
+  .card.purple .card-label { color: var(--purple); }
+  .card.gold .card-label   { color: var(--gold); }
+  .card.green .card-label  { color: var(--green); }
+
+  .card-q {
+    font-size: 15px; font-weight: 600; line-height: 1.5;
+    margin-bottom: 14px; color: var(--white);
+  }
+  .card-note {
+    font-size: 12px; color: var(--gray); font-style: italic;
+    margin-bottom: 12px; line-height: 1.5;
+  }
+
+  /* ── INPUTS ── */
+  input[type="text"], input[type="number"], textarea, select {
+    width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--white);
+    font-size: 15px;
+    padding: 12px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    font-family: inherit;
+  }
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--cyan);
+    box-shadow: 0 0 0 2px rgba(0,212,255,0.15);
+  }
+  textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+  ::placeholder { color: var(--gray); }
+
+  input[type="number"] { -moz-appearance: textfield; }
+  input[type="number"]::-webkit-inner-spin-button { display: none; }
+
+  /* ── RADIO / CHOICE ── */
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+  .choice-btn {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--panel);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px; color: var(--white);
+    text-align: left;
+  }
+  .choice-btn:hover { border-color: var(--cyan); background: rgba(0,212,255,0.06); }
+  .choice-btn.selected {
+    border-color: var(--cyan);
+    background: rgba(0,212,255,0.12);
+    color: var(--cyan);
+    font-weight: 600;
+  }
+  .choice-letter {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    flex-shrink: 0;
+    transition: background 0.2s;
+  }
+  .choice-btn.selected .choice-letter {
+    background: var(--cyan);
+    color: var(--bg);
+  }
+
+  /* ── ALLOCATION GRID ── */
+  .alloc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 6px;
+  }
+  .alloc-item label {
+    display: block;
+    font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+    color: var(--gray); text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .alloc-total {
+    grid-column: 1 / -1;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 14px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+  }
+  .alloc-total-val {
+    font-size: 18px; font-weight: 800;
+    color: var(--white);
+  }
+  .alloc-total-val.ok  { color: var(--green); }
+  .alloc-total-val.err { color: var(--red); }
+  .alloc-label { color: var(--gray); font-size: 12px; }
+
+  /* ── TIMER CHIP ── */
+  .timer-chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.3);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px; font-weight: 700; color: var(--cyan);
+    margin-bottom: 18px;
+  }
+  .timer-chip.gold {
+    background: rgba(255,215,0,0.08);
+    border-color: rgba(255,215,0,0.3);
+    color: var(--gold);
+  }
+
+  /* ── BUTTONS ── */
+  .btn-next {
+    width: 100%;
+    background: linear-gradient(135deg, var(--cyan), #0099CC);
+    color: var(--bg);
+    border: none;
+    border-radius: 10px;
+    padding: 16px;
+    font-size: 16px; font-weight: 800;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: opacity 0.2s, transform 0.1s;
+    letter-spacing: 0.5px;
+  }
+  .btn-next:hover  { opacity: 0.9; }
+  .btn-next:active { transform: scale(0.98); }
+  .btn-next:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-next.purple {
+    background: linear-gradient(135deg, var(--purple), #4A1FC4);
+    color: var(--white);
+  }
+  .btn-next.gold {
+    background: linear-gradient(135deg, var(--gold), #CC9900);
+    color: var(--bg);
+  }
+
+  /* ── QUIZ ANSWER REVEAL ── */
+  .quiz-feedback {
+    display: none;
+    margin-top: 14px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    font-size: 13px; line-height: 1.6;
+  }
+  .quiz-feedback.correct {
+    background: rgba(0,229,160,0.12);
+    border: 1px solid rgba(0,229,160,0.4);
+    color: var(--green);
+  }
+  .quiz-feedback.wrong {
+    background: rgba(255,77,109,0.1);
+    border: 1px solid rgba(255,77,109,0.3);
+    color: #FF8FA3;
+  }
+  .quiz-feedback .answer-label {
+    font-weight: 700; margin-bottom: 4px;
+    display: block;
+  }
+
+  /* ── NEWS CARD ── */
+  .news-card {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .news-card.crash { border-color: var(--red); }
+  .news-card.boom  { border-color: var(--green); }
+  .news-headline {
+    font-size: 16px; font-weight: 700; margin-bottom: 8px;
+  }
+  .news-body { font-size: 13px; color: var(--gray); margin-bottom: 12px; line-height: 1.6; }
+  .news-impacts {
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .news-impact {
+    font-size: 12px; font-weight: 700;
+    padding: 4px 10px; border-radius: 20px;
+  }
+  .news-impact.up   { background: rgba(0,229,160,0.15); color: var(--green); }
+  .news-impact.down { background: rgba(255,77,109,0.15); color: var(--red); }
+  .news-impact.flat { background: rgba(136,153,204,0.15); color: var(--gray); }
+
+  /* ── HERO / INTRO ── */
+  .hero {
+    text-align: center;
+    padding: 30px 0 10px;
+  }
+  .hero-icon { font-size: 64px; margin-bottom: 16px; }
+  .hero-title {
+    font-size: 32px; font-weight: 900; line-height: 1.1;
+    margin-bottom: 10px;
+  }
+  .hero-title em { color: var(--cyan); font-style: normal; }
+  .hero-sub {
+    font-size: 14px; color: var(--gray);
+    margin-bottom: 28px; line-height: 1.6;
+  }
+  .hero-pills {
+    display: flex; gap: 10px; justify-content: center;
+    flex-wrap: wrap; margin-bottom: 30px;
+  }
+  .pill {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px; font-weight: 600; color: var(--gray);
+  }
+
+  /* ── FINAL SCREEN ── */
+  .final-wrap { text-align: center; padding: 20px 0; }
+  .final-icon { font-size: 72px; margin-bottom: 20px; }
+  .final-title { font-size: 30px; font-weight: 900; margin-bottom: 8px; }
+  .final-sub { color: var(--gray); font-size: 14px; margin-bottom: 28px; line-height: 1.6; }
+  .summary-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: left;
+    margin-bottom: 20px;
+  }
+  .summary-row {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px; gap: 12px;
+  }
+  .summary-row:last-child { border-bottom: none; }
+  .summary-key { color: var(--gray); flex-shrink: 0; max-width: 45%; }
+  .summary-val { color: var(--white); font-weight: 600; text-align: right; max-width: 55%; word-break: break-word; }
+  .copy-btn {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--cyan);
+    color: var(--cyan);
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 14px; font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-bottom: 12px;
+  }
+  .copy-btn:hover { background: rgba(0,212,255,0.1); }
+  .copy-btn.copied { color: var(--green); border-color: var(--green); }
+
+  /* ── SCORE DISPLAY ── */
+  .score-ring {
+    width: 110px; height: 110px;
+    margin: 0 auto 16px;
+    position: relative;
+  }
+  .score-ring svg { transform: rotate(-90deg); }
+  .score-ring-text {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+  }
+  .score-num { font-size: 30px; font-weight: 900; color: var(--cyan); }
+  .score-denom { font-size: 12px; color: var(--gray); }
+
+  /* ── SECTION DIVIDER ── */
+  .sec-divider {
+    display: flex; align-items: center; gap: 14px;
+    margin: 28px 0 22px;
+  }
+  .sec-divider-line { flex: 1; height: 1px; background: var(--border); }
+  .sec-divider-text { font-size: 11px; color: var(--gray); font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; }
+
+  /* ── BACK BUTTON ── */
+  .btn-back {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: none; border: none;
+    color: var(--gray); font-size: 13px;
+    cursor: pointer; padding: 0;
+    margin-bottom: 18px;
+    font-family: inherit;
+  }
+  .btn-back:hover { color: var(--white); }
+
+  /* mobile */
+  @media (max-width: 480px) {
+    .alloc-grid { grid-template-columns: 1fr; }
+    .hero-title { font-size: 26px; }
+    .section-title { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar"></div>
+
+<div class="progress-wrap">
+  <span class="progress-label">Progression</span>
+  <div class="progress-bar-bg">
+    <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+  </div>
+  <span class="progress-pct" id="progressPct">0%</span>
+</div>
+
+<div class="main">
+
+  <!-- ══════════════ SECTION 0 — ACCUEIL ══════════════ -->
+  <div class="section active" id="sec0">
+    <div class="hero">
+      <div class="hero-icon">🧠📈</div>
+      <h1 class="hero-title">Finance <em>en pratique</em></h1>
+      <p class="hero-sub">Atelier interactif 60 min · Licence 2 Économie<br>Répondez instinctivement — vos réponses sont <strong>anonymes</strong></p>
+      <div class="hero-pills">
+        <span class="pill">⚓ Biais d'ancrage</span>
+        <span class="pill">⚖️ Aversion à la perte</span>
+        <span class="pill">🎟️ Effet de dotation</span>
+        <span class="pill">📊 Simulation marché</span>
+        <span class="pill">🏆 Quiz final</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Identifiant équipe</div>
+      <p class="card-q">Quel est le code de votre équipe ?</p>
+      <p class="card-note">Votre animateur vous l'a indiqué (ex : ÉQUIPE-A, ÉQUIPE-B…)</p>
+      <input type="text" id="teamId" placeholder="ex : ÉQUIPE-A" maxlength="20" autocomplete="off" spellcheck="false">
+    </div>
+
+    <button class="btn-next" onclick="goNext(0)">Commencer l'atelier →</button>
+  </div>
+
+  <!-- ══════════════ SECTION 1 — ANCRAGE ══════════════ -->
+  <div class="section" id="sec1">
+    <button class="btn-back" onclick="goBack(1)">← Retour</button>
+    <div class="section-badge">Expérience 01 / 03</div>
+    <h2 class="section-title">Biais d'<span>ancrage</span></h2>
+    <p class="section-sub">Répondez instinctivement — pas de recherche, pas de consultation. Votre premier réflexe compte.</p>
+    <div class="timer-chip">⏱ 90 secondes</div>
+
+    <div class="card">
+      <div class="card-label">Question A</div>
+      <p class="card-q">La population de Lyon est-elle supérieure ou inférieure à 2 000 000 habitants ?</p>
+      <div class="choices" id="anchQ1">
+        <button class="choice-btn" onclick="selectChoice('anchQ1', this, 'sup')">
+          <span class="choice-letter">A</span>
+          <span>Supérieure à 2 000 000 habitants</span>
+        </button>
+        <button class="choice-btn" onclick="selectChoice('anchQ1', this, 'inf')">
+          <span class="choice-letter">B</span>
+          <span>Inférieure à 2 000 000 habitants</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="card purple">
+      <div class="card-label">Question B</div>
+      <p class="card-q">Estimez maintenant la population réelle de Lyon (en nombre d'habitants) :</p>
+      <p class="card-note">Donnez votre meilleure estimation sans chercher sur Internet</p>
+      <input type="number" id="anchQ2" placeholder="ex : 800000" min="50000" max="5000000">
+    </div>
+
+    <button class="btn-next purple" onclick="goNext(1)">Valider & continuer →</button>
+  </div>
+
+  <!-- ══════════════ SECTION 2 — AVERSION À LA PERTE ══════════════ -->
+  <div class="section" id="sec2">
+    <button class="btn-back" onclick="goBack(2)">← Retour</button>
+    <div class="section-badge">Expérience 02 / 03</div>
+    <h2 class="section-title">Aversion à la <span>perte</span></h2>
+    <p class="section-sub">Imaginez que c'est votre argent réel. Quelle option choisissez-vous ?</p>
+    <div class="timer-chip">⏱ 90 secondes</div>
+
+    <div class="card">
+      <div class="card-label">Faites votre choix</div>
+      <p class="card-q">Vous devez choisir entre deux options :</p>
+      <div class="choices" id="lossQ1" style="margin-top:14px">
+        <button class="choice-btn" onclick="selectChoice('lossQ1', this, 'X')">
+          <span class="choice-letter">X</span>
+          <div>
+            <strong>Option X</strong> — 500 € <em>certains</em>
+            <br><span style="color:var(--gray);font-size:12px">Valeur espérée : 500 €</span>
+          </div>
+        </button>
+        <button class="choice-btn" onclick="selectChoice('lossQ1', this, 'Y')">
+          <span class="choice-letter">Y</span>
+          <div>
+            <strong>Option Y</strong> — 50% de chance de gagner 1 200 €, 50% de ne rien gagner
+            <br><span style="color:var(--gray);font-size:12px">Valeur espérée : 600 €</span>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <div class="card gold">
+      <div class="card-label">Justification (optionnel)</div>
+      <p class="card-q">En une phrase, pourquoi avez-vous fait ce choix ?</p>
+      <textarea id="lossQ2" placeholder="ex : J'ai choisi X parce que je préfère la sécurité..."></textarea>
+    </div>
+
+    <button class="btn-next gold" onclick="goNext(2)">Valider & continuer →</button>
+  </div>
+
+  <!-- ══════════════ SECTION 3 — EFFET DE DOTATION ══════════════ -->
+  <div class="section" id="sec3">
+    <button class="btn-back" onclick="goBack(3)">← Retour</button>
+    <div class="section-badge">Expérience 03 / 03</div>
+    <h2 class="section-title">Effet de <span>dotation</span></h2>
+    <p class="section-sub">Répondez avec votre premier instinct — sans calculer, sans réfléchir trop longtemps.</p>
+    <div class="timer-chip">⏱ 60 secondes</div>
+
+    <div class="card">
+      <div class="card-label">Scénario</div>
+      <p class="card-q" style="line-height:1.7">Imaginez que vous <strong style="color:var(--cyan)">possédez déjà</strong> un billet de concert acheté 80 €. Vous recevez une offre d'achat. À quel prix <strong>minimum</strong> accepteriez-vous de le vendre ?</p>
+      <div style="position:relative;margin-top:12px">
+        <input type="number" id="dotQ1" placeholder="ex : 100" min="0" max="10000">
+        <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--gray);font-size:14px;font-weight:700">€</span>
+      </div>
+    </div>
+
+    <div class="card purple">
+      <div class="card-label">Scénario inverse</div>
+      <p class="card-q">Si vous <strong style="color:var(--purple)">ne possédiez pas</strong> ce billet, combien seriez-vous prêt(e) à <strong>payer</strong> pour l'acheter ?</p>
+      <div style="position:relative;margin-top:12px">
+        <input type="number" id="dotQ2" placeholder="ex : 70" min="0" max="10000">
+        <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--gray);font-size:14px;font-weight:700">€</span>
+      </div>
+    </div>
+
+    <button class="btn-next" onclick="goNext(3)">Valider & continuer →</button>
+  </div>
+
+  <!-- ══════════════ SECTION 4 — SIMULATION TOUR 1 ══════════════ -->
+  <div class="section" id="sec4">
+    <button class="btn-back" onclick="goBack(4)">← Retour</button>
+    <div class="section-badge">Simulation · Tour 1 / 3</div>
+    <h2 class="section-title">Allocation <span>initiale</span></h2>
+    <p class="section-sub">Vous disposez de <strong style="color:var(--gold)">1 000 €</strong>. Répartissez entre les 4 actifs. Total = exactement 1 000 €.</p>
+    <div class="timer-chip gold">⏱ 3 minutes · Prix initiaux : A=100€ B=100€ C=100€ D=1€/€</div>
+
+    <div class="card gold">
+      <div class="card-label">Actifs disponibles</div>
+      <div style="display:grid;gap:8px;margin-bottom:16px;font-size:13px">
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+          <span><strong>A</strong> — Actions Tech</span><span style="color:var(--red);font-weight:700">⚡ Risque élevé</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+          <span><strong>B</strong> — Obligations</span><span style="color:var(--gold);font-weight:700">📊 Risque modéré</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+          <span><strong>C</strong> — Or</span><span style="color:var(--gold);font-weight:700">✨ Risque modéré</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0">
+          <span><strong>D</strong> — Cash</span><span style="color:var(--green);font-weight:700">🛡 Risque nul</span>
+        </div>
+      </div>
+      <div class="alloc-grid">
+        <div class="alloc-item">
+          <label>Actif A — Actions Tech (€)</label>
+          <input type="number" id="t1a" placeholder="0" min="0" max="1000" oninput="updateTotal('t1')">
+        </div>
+        <div class="alloc-item">
+          <label>Actif B — Obligations (€)</label>
+          <input type="number" id="t1b" placeholder="0" min="0" max="1000" oninput="updateTotal('t1')">
+        </div>
+        <div class="alloc-item">
+          <label>Actif C — Or (€)</label>
+          <input type="number" id="t1c" placeholder="0" min="0" max="1000" oninput="updateTotal('t1')">
+        </div>
+        <div class="alloc-item">
+          <label>Actif D — Cash (€)</label>
+          <input type="number" id="t1d" placeholder="0" min="0" max="1000" oninput="updateTotal('t1')">
+        </div>
+        <div class="alloc-total">
+          <span class="alloc-label">Total alloué</span>
+          <span class="alloc-total-val" id="t1total">0 €</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-next gold" onclick="goNext(4)">Envoyer Tour 1 →</button>
+  </div>
+
+  <!-- ══════════════ SECTION 5 — NEWS + TOUR 2 ══════════════ -->
+  <div class="section" id="sec5">
+    <button class="btn-back" onclick="goBack(5)">← Retour</button>
+    <div class="section-badge">Simulation · Tour 2 / 3 · CRASH</div>
+    <h2 class="section-title">🚨 Carte <span>News</span></h2>
+
+    <div class="news-card crash">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <span style="font-size:22px">📰</span>
+        <span style="font-size:11px;font-weight:700;letter-spacing:2px;color:var(--red)">BREAKING NEWS — CRASH DE MARCHÉ</span>
+      </div>
+      <p class="news-headline">Crise financière mondiale : une banque américaine fait faillite</p>
+      <p class="news-body">Les marchés plongent. Les investisseurs paniquent et vendent en masse. Les banques centrales sont en réunion d'urgence.</p>
+      <div class="news-impacts">
+        <span class="news-impact down">A (Tech) −25%</span>
+        <span class="news-impact down">B (Oblig.) −15%</span>
+        <span class="news-impact up">C (Or) +12%</span>
+        <span class="news-impact flat">D (Cash) 0%</span>
+      </div>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:20px;font-size:13px">
+      <div style="color:var(--gray);margin-bottom:8px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase">Nouveaux prix</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--gray)">Actif A</span><span style="color:var(--red);font-weight:700">82,50 €</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--gray)">Actif B</span><span style="color:var(--red);font-weight:700">89,25 €</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--gray)">Actif C</span><span style="color:var(--green);font-weight:700">112 €</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--gray)">Actif D</span><span style="color:var(--gray);font-weight:700">1 € / €</span></div>
+      </div>
+    </div>
+
+    <h3 style="font-size:17px;font-weight:700;margin-bottom:6px">Vous pouvez réallouer votre portefeuille</h3>
+    <p class="section-sub">Après le crash, comment répartissez-vous vos 1 000 € initiaux ?</p>
+    <div class="timer-chip">⏱ 3 minutes</div>
+
+    <div class="card red">
+      <div class="card-label">Tour 2 — Nouvelle allocation</div>
+      <div class="alloc-grid">
+        <div class="alloc-item"><label>Actif A (€)</label><input type="number" id="t2a" placeholder="0" min="0" max="1000" oninput="updateTotal('t2')"></div>
+        <div class="alloc-item"><label>Actif B (€)</label><input type="number" id="t2b" placeholder="0" min="0" max="1000" oninput="updateTotal('t2')"></div>
+        <div class="alloc-item"><label>Actif C (€)</label><input type="number" id="t2c" placeholder="0" min="0" max="1000" oninput="updateTotal('t2')"></div>
+        <div class="alloc-item"><label>Actif D (€)</label><input type="number" id="t2d" placeholder="0" min="0" max="1000" oninput="updateTotal('t2')"></div>
+        <div class="alloc-total">
+          <span class="alloc-label">Total alloué</span>
+          <span class="alloc-total-val" id="t2total">0 €</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-next" onclick="goNext(5)">Envoyer Tour 2 →</button>
+  </div>
+
+  <!-- ══════════════ SECTION 6 — NEWS + TOUR 3 ══════════════ -->
+  <div class="section" id="sec6">
+    <button class="btn-back" onclick="goBack(6)">← Retour</button>
+    <div class="section-badge">Simulation · Tour 3 / 3 · REBOND</div>
+    <h2 class="section-title">📈 Carte <span>News</span></h2>
+
+    <div class="news-card boom">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <span style="font-size:22px">📰</span>
+        <span style="font-size:11px;font-weight:700;letter-spacing:2px;color:var(--green)">BREAKING NEWS — REBOND</span>
+      </div>
+      <p class="news-headline">Intervention des banques centrales : les marchés rebondissent</p>
+      <p class="news-body">Injection massive de liquidités. La confiance revient. Les actions tech reprennent fortement. L'or recule.</p>
+      <div class="news-impacts">
+        <span class="news-impact up">A (Tech) +20%</span>
+        <span class="news-impact up">B (Oblig.) +8%</span>
+        <span class="news-impact down">C (Or) −10%</span>
+        <span class="news-impact flat">D (Cash) 0%</span>
+      </div>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:20px;font-size:13px">
+      <div style="color:var(--gray);margin-bottom:8px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase">Prix finaux (après Tour 3)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--gray)">Actif A</span><span style="color:var(--green);font-weight:700">99 €</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--gray)">Actif B</span><span style="color:var(--green);font-weight:700">96,39 €</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--gray)">Actif C</span><span style="color:var(--green);font-weight:700">100,80 €</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--gray)">Actif D</span><span style="color:var(--gray);font-weight:700">1 € / €</span></div>
+      </div>
+    </div>
+
+    <h3 style="font-size:17px;font-weight:700;margin-bottom:6px">Dernière chance — Tour 3 !</h3>
+    <p class="section-sub">Allocation finale. Les prix ci-dessus seront utilisés pour calculer votre valeur de portefeuille finale.</p>
+    <div class="timer-chip">⏱ 3 minutes</div>
+
+    <div class="card green">
+      <div class="card-label">Tour 3 — Allocation finale</div>
+      <div class="alloc-grid">
+        <div class="alloc-item"><label>Actif A (€)</label><input type="number" id="t3a" placeholder="0" min="0" max="1000" oninput="updateTotal('t3')"></div>
+        <div class="alloc-item"><label>Actif B (€)</label><input type="number" id="t3b" placeholder="0" min="0" max="1000" oninput="updateTotal('t3')"></div>
+        <div class="alloc-item"><label>Actif C (€)</label><input type="number" id="t3c" placeholder="0" min="0" max="1000" oninput="updateTotal('t3')"></div>
+        <div class="alloc-item"><label>Actif D (€)</label><input type="number" id="t3d" placeholder="0" min="0" max="1000" oninput="updateTotal('t3')"></div>
+        <div class="alloc-total">
+          <span class="alloc-label">Total alloué</span>
+          <span class="alloc-total-val" id="t3total">0 €</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-next green" onclick="goNext(6)" style="background:linear-gradient(135deg,var(--green),#009966);color:var(--bg)">Envoyer Tour 3 →</button>
+  </div>
+
+  <!-- ══════════════ SECTION 7 — QUIZ FINAL ══════════════ -->
+  <div class="section" id="sec7">
+    <button class="btn-back" onclick="goBack(7)">← Retour</button>
+    <div class="section-badge">Quiz final · 8 Questions</div>
+    <h2 class="section-title">🏆 Quiz <span>interactif</span></h2>
+    <p class="section-sub">Répondez individuellement, sans consulter votre équipe. La bonne réponse s'affiche après votre choix.</p>
+    <div class="timer-chip gold">⏱ 7 minutes au total</div>
+
+    <!-- Q1 -->
+    <div class="card" id="qcard1">
+      <div class="card-label">Question 1 / 8</div>
+      <p class="card-q">Qu'est-ce que la diversification en finance ?</p>
+      <div class="choices" id="quiz1">
+        <button class="choice-btn" onclick="answerQuiz(1,'A','B')"><span class="choice-letter">A</span><span>Investir tout son argent dans le meilleur actif</span></button>
+        <button class="choice-btn" onclick="answerQuiz(1,'B','B')"><span class="choice-letter">B</span><span>Répartir ses investissements pour réduire le risque</span></button>
+        <button class="choice-btn" onclick="answerQuiz(1,'C','B')"><span class="choice-letter">C</span><span>Changer d'actifs très fréquemment</span></button>
+        <button class="choice-btn" onclick="answerQuiz(1,'D','B')"><span class="choice-letter">D</span><span>Investir uniquement en période de hausse</span></button>
+      </div>
+      <div class="quiz-feedback" id="qfb1">
+        <span class="answer-label">✅ Bonne réponse : B</span>
+        Si un actif chute, les autres compensent. Ne jamais mettre tous ses œufs dans le même panier.
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="card">
+      <div class="card-label">Question 2 / 8</div>
+      <p class="card-q">Un actif très liquide, c'est :</p>
+      <div class="choices" id="quiz2">
+        <button class="choice-btn" onclick="answerQuiz(2,'A','C')"><span class="choice-letter">A</span><span>Un appartement en centre-ville</span></button>
+        <button class="choice-btn" onclick="answerQuiz(2,'B','C')"><span class="choice-letter">B</span><span>Une forêt ancienne</span></button>
+        <button class="choice-btn" onclick="answerQuiz(2,'C','C')"><span class="choice-letter">C</span><span>De l'argent sur un compte courant</span></button>
+        <button class="choice-btn" onclick="answerQuiz(2,'D','C')"><span class="choice-letter">D</span><span>Des obligations d'État à 30 ans</span></button>
+      </div>
+      <div class="quiz-feedback" id="qfb2">
+        <span class="answer-label">✅ Bonne réponse : C</span>
+        Vous le récupérez instantanément. Un appartement peut prendre des mois à vendre.
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="card">
+      <div class="card-label">Question 3 / 8</div>
+      <p class="card-q">L'ancrage (anchoring) est un biais qui consiste à :</p>
+      <div class="choices" id="quiz3">
+        <button class="choice-btn" onclick="answerQuiz(3,'A','A')"><span class="choice-letter">A</span><span>S'attacher trop à la première information reçue</span></button>
+        <button class="choice-btn" onclick="answerQuiz(3,'B','A')"><span class="choice-letter">B</span><span>Refuser de prendre des décisions risquées</span></button>
+        <button class="choice-btn" onclick="answerQuiz(3,'C','A')"><span class="choice-letter">C</span><span>Surestimer la valeur des objets qu'on possède</span></button>
+        <button class="choice-btn" onclick="answerQuiz(3,'D','A')"><span class="choice-letter">D</span><span>Toujours suivre les décisions du groupe</span></button>
+      </div>
+      <div class="quiz-feedback" id="qfb3">
+        <span class="answer-label">✅ Bonne réponse : A</span>
+        Comme avec la population de Lyon : le chiffre 2 millions a influencé votre estimation !
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="card">
+      <div class="card-label">Question 4 / 8</div>
+      <p class="card-q">L'aversion à la perte signifie que :</p>
+      <div class="choices" id="quiz4">
+        <button class="choice-btn" onclick="answerQuiz(4,'A','B')"><span class="choice-letter">A</span><span>On préfère toujours le risque maximum</span></button>
+        <button class="choice-btn" onclick="answerQuiz(4,'B','B')"><span class="choice-letter">B</span><span>On ressent plus fortement les pertes que les gains équivalents</span></button>
+        <button class="choice-btn" onclick="answerQuiz(4,'C','B')"><span class="choice-letter">C</span><span>On refuse d'investir si les rendements sont trop élevés</span></button>
+        <button class="choice-btn" onclick="answerQuiz(4,'D','B')"><span class="choice-letter">D</span><span>On prend de meilleures décisions sous pression</span></button>
+      </div>
+      <div class="quiz-feedback" id="qfb4">
+        <span class="answer-label">✅ Bonne réponse : B</span>
+        Perdre 100 € fait ~2× plus mal psychologiquement que gagner 100 € fait plaisir.
+      </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="card">
+      <div class="card-label">Question 5 / 8</div>
+      <p class="card-q">Si un actif fait +10% et un autre −5%, votre portefeuille moitié-moitié affiche :</p>
+      <div class="choices" id="quiz5">
+        <button class="choice-btn" onclick="answerQuiz(5,'A','C')"><span class="choice-letter">A</span><span>+10%</span></button>
+        <button class="choice-btn" onclick="answerQuiz(5,'B','C')"><span class="choice-letter">B</span><span>−5%</span></button>
+        <button class="choice-btn" onclick="answerQuiz(5,'C','C')"><span class="choice-letter">C</span><span>+2,5%</span></button>
+        <button class="choice-btn" onclick="answerQuiz(5,'D','C')"><span class="choice-letter">D</span><span>+5%</span></button>
+      </div>
+      <div class="quiz-feedback" id="qfb5">
+        <span class="answer-label">✅ Bonne réponse : C</span>
+        (10% × 0,5) + (−5% × 0,5) = 5% − 2,5% = +2,5%. C'est la moyenne pondérée des rendements.
+      </div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="card">
+      <div class="card-label">Question 6 / 8</div>
+      <p class="card-q">L'effet de dotation signifie :</p>
+      <div class="choices" id="quiz6">
+        <button class="choice-btn" onclick="answerQuiz(6,'A','B')"><span class="choice-letter">A</span><span>On achète plus quand les prix baissent</span></button>
+        <button class="choice-btn" onclick="answerQuiz(6,'B','B')"><span class="choice-letter">B</span><span>On valorise plus ce qu'on possède déjà</span></button>
+        <button class="choice-btn" onclick="answerQuiz(6,'C','B')"><span class="choice-letter">C</span><span>On préfère les actifs inconnus</span></button>
+        <button class="choice-btn" onclick="answerQuiz(6,'D','B')"><span class="choice-letter">D</span><span>On fait confiance aux experts plutôt qu'à son instinct</span></button>
+      </div>
+      <div class="quiz-feedback" id="qfb6">
+        <span class="answer-label">✅ Bonne réponse : B</span>
+        Vous vendriez votre billet plus cher que vous ne l'achèteriez. C'est l'effet de dotation en action !
+      </div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="card">
+      <div class="card-label">Question 7 / 8</div>
+      <p class="card-q">Dans notre simulation, quel actif était le plus risqué ?</p>
+      <div class="choices" id="quiz7">
+        <button class="choice-btn" onclick="answerQuiz(7,'A','D')"><span class="choice-letter">A</span><span>Actif B — Obligations</span></button>
+        <button class="choice-btn" onclick="answerQuiz(7,'B','D')"><span class="choice-letter">B</span><span>Actif D — Cash</span></button>
+        <button class="choice-btn" onclick="answerQuiz(7,'C','D')"><span class="choice-letter">C</span><span>Actif C — Or</span></button>
+        <button class="choice-btn" onclick="answerQuiz(7,'D','D')"><span class="choice-letter">D</span><span>Actif A — Actions Tech</span></button>
+      </div>
+      <div class="quiz-feedback" id="qfb7">
+        <span class="answer-label">✅ Bonne réponse : D</span>
+        A a perdu −25% au crash puis regagné +20% au rebond. Haute volatilité = haut risque.
+      </div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="card">
+      <div class="card-label">Question 8 / 8</div>
+      <p class="card-q">Pourquoi les marchés financiers ne sont-ils pas toujours rationnels ?</p>
+      <div class="choices" id="quiz8">
+        <button class="choice-btn" onclick="answerQuiz(8,'A','C')"><span class="choice-letter">A</span><span>Les algorithmes font des erreurs de calcul</span></button>
+        <button class="choice-btn" onclick="answerQuiz(8,'B','C')"><span class="choice-letter">B</span><span>Les banques centrales manipulent les prix</span></button>
+        <button class="choice-btn" onclick="answerQuiz(8,'C','C')"><span class="choice-letter">C</span><span>Les investisseurs humains sont influencés par leurs émotions et biais</span></button>
+        <button class="choice-btn" onclick="answerQuiz(8,'D','C')"><span class="choice-letter">D</span><span>Les informations financières sont toujours fausses</span></button>
+      </div>
+      <div class="quiz-feedback" id="qfb8">
+        <span class="answer-label">✅ Bonne réponse : C</span>
+        Vous venez de le vivre ! Ancrage, aversion à la perte, dotation — ces biais affectent des milliards de décisions.
+      </div>
+    </div>
+
+    <!-- ── Feedback libre ── -->
+    <div class="sec-divider">
+      <div class="sec-divider-line"></div>
+      <span class="sec-divider-text">Feedback</span>
+      <div class="sec-divider-line"></div>
+    </div>
+    <div class="card">
+      <div class="card-label">Pour finir</div>
+      <p class="card-q">En une phrase, qu'est-ce que vous retenez de cet atelier ?</p>
+      <textarea id="feedback" placeholder="Votre retour (optionnel)..."></textarea>
+    </div>
+
+    <button class="btn-next" onclick="goNext(7)" style="background:linear-gradient(135deg,var(--purple),#4A1FC4);color:var(--white)">Voir mon récapitulatif →</button>
+  </div>
+
+  <!-- ══════════════ SECTION 8 — RÉSULTATS FINAUX ══════════════ -->
+  <div class="section" id="sec8">
+    <div class="final-wrap">
+
+      <!-- Score ring -->
+      <div class="score-ring">
+        <svg width="110" height="110" viewBox="0 0 110 110">
+          <circle cx="55" cy="55" r="48" fill="none" stroke="#1E2A5A" stroke-width="10"/>
+          <circle cx="55" cy="55" r="48" fill="none" stroke="url(#scoreGrad)" stroke-width="10"
+            stroke-dasharray="301.6" stroke-dashoffset="301.6" stroke-linecap="round"
+            id="scoreCircle"/>
+          <defs>
+            <linearGradient id="scoreGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#00D4FF"/>
+              <stop offset="100%" stop-color="#6C3CE1"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="score-ring-text">
+          <span class="score-num" id="scoreNum">0</span>
+          <span class="score-denom">/ 8</span>
+        </div>
+      </div>
+
+      <h2 class="final-title">Récapitulatif</h2>
+      <p class="final-sub">Voici vos réponses et votre score de quiz.<br>Prenez une capture d'écran ou copiez vos données.</p>
+
+      <!-- Valeur finale du portefeuille -->
+      <div class="card gold" style="text-align:left;margin-bottom:16px">
+        <div class="card-label">💰 Valeur finale de votre portefeuille (Tour 3)</div>
+        <div style="font-size:36px;font-weight:900;color:var(--gold);margin:10px 0 4px" id="portfolioVal">— €</div>
+        <div style="font-size:12px;color:var(--gray)">Sur 1 000 € investis au départ</div>
+        <div id="portfolioDiff" style="font-size:14px;font-weight:700;margin-top:6px"></div>
+      </div>
+
+      <!-- Summary -->
+      <div class="summary-box">
+        <div id="summaryContent"></div>
+      </div>
+
+      <button class="copy-btn" id="copyBtn" onclick="copyData()">📋 Copier toutes mes réponses</button>
+      <button class="btn-next" style="margin-top:0;background:linear-gradient(135deg,var(--purple),#4A1FC4);color:var(--white)" onclick="restartAll()">↺ Recommencer</button>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+// ── STATE ──
+let state = {
+  teamId: '', currentSection: 0,
+  anchQ1: null, anchQ2: '',
+  lossQ1: null, lossQ2: '',
+  dotQ1: '', dotQ2: '',
+  t1a:'',t1b:'',t1c:'',t1d:'',
+  t2a:'',t2b:'',t2c:'',t2d:'',
+  t3a:'',t3b:'',t3c:'',t3d:'',
+  quiz: {}, feedback: '',
+  quizScore: 0,
+};
+
+const SECTIONS = 9;
+
+// ── PROGRESS ──
+function setProgress(n) {
+  const pct = Math.round((n / (SECTIONS - 1)) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPct').textContent = pct + '%';
+}
+
+// ── NAVIGATION ──
+function showSection(n) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec' + n).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  state.currentSection = n;
+  setProgress(n);
+}
+
+function goBack(from) { showSection(from - 1); }
+
+function goNext(from) {
+  if (!validateSection(from)) return;
+  saveSection(from);
+  if (from === 7) buildResults();
+  showSection(from + 1);
+}
+
+// ── VALIDATION ──
+function validateSection(n) {
+  if (n === 0) {
+    const v = document.getElementById('teamId').value.trim();
+    if (!v) { shake('teamId'); return false; }
+    state.teamId = v;
+    return true;
+  }
+  if (n === 1) {
+    if (!state.anchQ1) { alert('Répondez à la question A.'); return false; }
+    const v = document.getElementById('anchQ2').value;
+    if (!v) { shake('anchQ2'); return false; }
+    return true;
+  }
+  if (n === 2) {
+    if (!state.lossQ1) { alert('Choisissez une option.'); return false; }
+    return true;
+  }
+  if (n === 3) {
+    const a = document.getElementById('dotQ1').value;
+    const b = document.getElementById('dotQ2').value;
+    if (!a || !b) { alert('Répondez aux deux questions.'); return false; }
+    return true;
+  }
+  if (n === 4) {
+    const tot = getTotal('t1');
+    if (tot !== 1000) { alert('Le total doit être exactement 1 000 €. Actuellement : ' + tot + ' €'); return false; }
+    return true;
+  }
+  if (n === 5) {
+    const tot = getTotal('t2');
+    if (tot !== 1000) { alert('Le total doit être exactement 1 000 €. Actuellement : ' + tot + ' €'); return false; }
+    return true;
+  }
+  if (n === 6) {
+    const tot = getTotal('t3');
+    if (tot !== 1000) { alert('Le total doit être exactement 1 000 €. Actuellement : ' + tot + ' €'); return false; }
+    return true;
+  }
+  return true;
+}
+
+// ── SAVE ──
+function saveSection(n) {
+  if (n === 1) {
+    state.anchQ2 = document.getElementById('anchQ2').value;
+  }
+  if (n === 2) {
+    state.lossQ2 = document.getElementById('lossQ2').value;
+  }
+  if (n === 3) {
+    state.dotQ1 = document.getElementById('dotQ1').value;
+    state.dotQ2 = document.getElementById('dotQ2').value;
+  }
+  if (n === 4) {
+    ['t1a','t1b','t1c','t1d'].forEach(id => state[id] = +document.getElementById(id).value || 0);
+  }
+  if (n === 5) {
+    ['t2a','t2b','t2c','t2d'].forEach(id => state[id] = +document.getElementById(id).value || 0);
+  }
+  if (n === 6) {
+    ['t3a','t3b','t3c','t3d'].forEach(id => state[id] = +document.getElementById(id).value || 0);
+  }
+  if (n === 7) {
+    state.feedback = document.getElementById('feedback').value;
+  }
+}
+
+// ── CHOICE SELECTION ──
+function selectChoice(groupId, btn, value) {
+  document.querySelectorAll('#' + groupId + ' .choice-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  if (groupId === 'anchQ1') state.anchQ1 = value;
+  if (groupId === 'lossQ1') state.lossQ1 = value;
+}
+
+// ── ALLOC TOTALS ──
+function getTotal(prefix) {
+  return ['a','b','c','d'].reduce((s,l) => s + (+document.getElementById(prefix+l).value || 0), 0);
+}
+
+function updateTotal(prefix) {
+  const tot = getTotal(prefix);
+  const el = document.getElementById(prefix + 'total');
+  el.textContent = tot.toLocaleString('fr-FR') + ' €';
+  el.className = 'alloc-total-val ' + (tot === 1000 ? 'ok' : tot > 1000 ? 'err' : '');
+}
+
+// ── QUIZ ──
+function answerQuiz(qNum, chosen, correct) {
+  const choices = document.querySelectorAll('#quiz' + qNum + ' .choice-btn');
+  choices.forEach(b => { b.style.pointerEvents = 'none'; });
+
+  const idx = ['A','B','C','D'].indexOf(chosen);
+  if (idx >= 0) {
+    choices[idx].style.borderColor = chosen === correct ? 'var(--green)' : 'var(--red)';
+    choices[idx].style.background = chosen === correct ? 'rgba(0,229,160,0.1)' : 'rgba(255,77,109,0.1)';
+    choices[idx].style.color = chosen === correct ? 'var(--green)' : 'var(--red)';
+  }
+
+  // also highlight correct if wrong
+  if (chosen !== correct) {
+    const cidx = ['A','B','C','D'].indexOf(correct);
+    choices[cidx].style.borderColor = 'var(--green)';
+    choices[cidx].style.background = 'rgba(0,229,160,0.08)';
+  }
+
+  const fb = document.getElementById('qfb' + qNum);
+  fb.style.display = 'block';
+  fb.className = 'quiz-feedback ' + (chosen === correct ? 'correct' : 'wrong');
+  if (chosen !== correct) {
+    fb.querySelector('.answer-label').textContent = '❌ Mauvaise réponse — Bonne réponse : ' + correct;
+  }
+
+  const isCorrect = chosen === correct;
+  state.quiz[qNum] = { chosen, correct, isCorrect };
+  if (isCorrect) state.quizScore++;
+}
+
+// ── RESULTS ──
+function buildResults() {
+  // Portfolio calculation
+  const prices = { a: 99, b: 96.39, c: 100.80, d: 1 };
+  const pfVal = (state.t3a / 100) * prices.a * 100
+              + (state.t3b / 100) * prices.b * 100
+              + (state.t3c / 100) * prices.c * 100
+              + state.t3d;
+
+  // Simpler: invest amount / 100 units at 100 each, so amt euros = amt/100 units
+  // Then value = (amt/100) * finalPrice * 100... no.
+  // Actually: player allocates euros. At 100€/unit initial, 1€ buys 0.01 units.
+  // Value of A allocation = (t3a € / 100 €/unit) * 99 €/unit = t3a * 0.99
+  const portfolioFinal = state.t3a * 0.99 + state.t3b * 0.9639 + state.t3c * 1.008 + state.t3d;
+  const diff = portfolioFinal - 1000;
+
+  document.getElementById('portfolioVal').textContent = portfolioFinal.toFixed(2).replace('.', ',') + ' €';
+  const diffEl = document.getElementById('portfolioDiff');
+  if (diff >= 0) {
+    diffEl.innerHTML = '<span style="color:var(--green)">▲ +' + diff.toFixed(2).replace('.', ',') + ' € de gain</span>';
+  } else {
+    diffEl.innerHTML = '<span style="color:var(--red)">▼ ' + diff.toFixed(2).replace('.', ',') + ' € de perte</span>';
+  }
+
+  // Score ring
+  const score = state.quizScore;
+  document.getElementById('scoreNum').textContent = score;
+  const circ = 2 * Math.PI * 48;
+  const offset = circ * (1 - score / 8);
+  setTimeout(() => { document.getElementById('scoreCircle').style.strokeDashoffset = offset; }, 200);
+
+  // Summary
+  const rows = [
+    ['Équipe', state.teamId],
+    ['Ancrage — Réponse A', state.anchQ1 === 'sup' ? 'Supérieure' : 'Inférieure'],
+    ['Ancrage — Estimation population', (parseInt(state.anchQ2)||0).toLocaleString('fr-FR') + ' hab.'],
+    ['Aversion perte — Choix', 'Option ' + (state.lossQ1 || '—')],
+    ['Effet dotation — Prix vente', (state.dotQ1||'—') + ' €'],
+    ['Effet dotation — Prix achat', (state.dotQ2||'—') + ' €'],
+    ['Tour 1 : A / B / C / D', `${state.t1a} / ${state.t1b} / ${state.t1c} / ${state.t1d}`],
+    ['Tour 2 : A / B / C / D', `${state.t2a} / ${state.t2b} / ${state.t2c} / ${state.t2d}`],
+    ['Tour 3 : A / B / C / D', `${state.t3a} / ${state.t3b} / ${state.t3c} / ${state.t3d}`],
+    ['Portefeuille final', portfolioFinal.toFixed(2).replace('.',',') + ' €'],
+    ['Score quiz', `${score} / 8`],
+    ['Feedback', state.feedback || '—'],
+  ];
+
+  document.getElementById('summaryContent').innerHTML = rows.map(([k,v]) =>
+    `<div class="summary-row"><span class="summary-key">${k}</span><span class="summary-val">${v}</span></div>`
+  ).join('');
+}
+
+function copyData() {
+  const rows = document.querySelectorAll('.summary-row');
+  let text = `=== Finance en pratique — ${state.teamId} ===\n`;
+  rows.forEach(r => {
+    const k = r.querySelector('.summary-key').textContent;
+    const v = r.querySelector('.summary-val').textContent;
+    text += `${k}: ${v}\n`;
+  });
+  text += `\nPortefeuille: ${document.getElementById('portfolioVal').textContent}`;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✅ Copié !';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 Copier toutes mes réponses'; btn.classList.remove('copied'); }, 2500);
+  });
+}
+
+function restartAll() {
+  state = { teamId:'', currentSection:0, anchQ1:null, anchQ2:'', lossQ1:null, lossQ2:'', dotQ1:'', dotQ2:'', t1a:0,t1b:0,t1c:0,t1d:0, t2a:0,t2b:0,t2c:0,t2d:0, t3a:0,t3b:0,t3c:0,t3d:0, quiz:{}, feedback:'', quizScore:0 };
+  showSection(0);
+}
+
+// ── SHAKE ANIM ──
+function shake(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.style.borderColor = 'var(--red)';
+  el.animate([{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(-4px)'},{transform:'translateX(4px)'},{transform:'translateX(0)'}], {duration:300}).onfinish = () => { el.style.borderColor = ''; };
+}
+
+// ── INIT ──
+setProgress(0);
+</script>
+</body>
+</html>
